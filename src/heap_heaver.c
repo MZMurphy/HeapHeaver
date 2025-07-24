@@ -1,7 +1,9 @@
+#define DEBUG_PRINT 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "memory_hooks.h"
+#include "log.h"
 
 // Global variables.
 int malloc_count, calloc_count, realloc_count, free_count;
@@ -10,10 +12,10 @@ int realloc_deallocation, free_deallocation;
 int total_allocation, total_dealloation;
 
 
-// hooks. 
-
-void hook_free(void* ptr)
+// Hooks. 
+void free(void* ptr)
 {
+    DEBUG("\nFree Hook Entered.");
     original_free(ptr);
     
     // counts... find deallocation count through tree. 
