@@ -1,9 +1,10 @@
-#define DEBUG_PRINT 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "memory_hooks.h"
+#define DEBUG_PRINT 1
 #include "log.h"
+
 
 // Global variables.
 int malloc_count, calloc_count, realloc_count, free_count;
@@ -16,6 +17,7 @@ int total_allocation, total_dealloation;
 void free(void* ptr)
 {
     DEBUG("\nFree Hook Entered.");
+    write(1, "\nIN MALLOC WRITE\n", 18);
     original_free(ptr);
     
     // counts... find deallocation count through tree. 
@@ -23,14 +25,20 @@ void free(void* ptr)
 
 void* malloc(size_t size)
 {
-    write(1, "malloc hook entered.\n", 22);
-
-    //puts("\nunder original_malloc");
+    DEBUG("\nMalloc Hook Entered.");
 
     void* result = original_malloc(size);
-    // add counts 
-    // add to bookkeeping
-    write(1, "malloc hook end.\n", 17);
+
+    if(result == NULL){return result;}
+
+    //Update counts and allocation size.
+    malloc_count++;
+    malloc_allocation +=size;
+    total_allocation +=size;
+
+    // To do:
+    // add to bookkeeping system, likely linkedlist.
+    DEBUG("\nMalloc Hook Exited.");
     return result; 
 } 
 
