@@ -16,11 +16,24 @@ int total_allocation, total_dealloation;
 // Hooks. 
 void free(void* ptr)
 {
-    DEBUG("\nFree Hook Entered.");
-    write(1, "\nIN MALLOC WRITE\n", 18);
+   DEBUG("\nFree Hook Entered.");
+
+   if(original_free != NULL)
+   {
     original_free(ptr);
-    
-    // counts... find deallocation count through tree. 
+   }else{
+    write(2, "Error: original_free is NULL\n", 29);
+    exit(1);
+   }
+
+   // Update counts and deallocations
+
+   free_count++;
+
+   // Free does not inherently know the size of the memory it is freeing...
+   // Need to track this.
+
+   DEBUG("\nFree Hook Exited·");
 }
 
 void* malloc(size_t size)
@@ -44,14 +57,39 @@ void* malloc(size_t size)
 
 void* calloc(size_t nmemb, size_t size)
 {
-    write(1, "In calloc\n", 11);
-    write(1, "Leaving calloc\n", 16);
-    // counts and bookkeeping
+    DEBUG("\nCalloc Hook Entered.");
+
+    void* result = original_calloc(nmemb, size);
+
+    if(result == NULL){return result;}
+    
+    // Update counts and allocation sizes.
+    calloc_count++;
+    calloc_allocation += (nmemb * size);
+    total_allocation += (nmemb * size);
+
+    DEBUG("\nCalloc Hook Exited.");
+    return result;
 }
 
 void* realloc(void* ptr, size_t size)
 {
-    ;
+    DEBUG("\nRealloc Hook Entered.");
+
+    void* result = original_realloc(ptr, size);
+
+    if(result == NULL){return result;}
+
+    // Update counts and allocation size...
+    realloc_count++;
+    realloc_allocation += size;
+    total_allocation += size;
+
+    // Realloc() like free() does not inherently know the size of the ptr it is being passed.
+    // We need to utilise the same bookkeeping mechanism as free...
+    // With the additional complexity of all the possible versions of realloc at play.
+    // See man realloc
+
     // lots of logic here
     // counts and add to bookkeeping
     // remove from bookkeepig
@@ -60,5 +98,7 @@ void* realloc(void* ptr, size_t size)
     // retunr null
     // move memory block - smaller, larger, same
     // unmove memory block - smaller, larger, same
+    DEBUG("\nRealloc Hook Exited.");
+    return result;
 }
 
