@@ -102,3 +102,82 @@ void* realloc(void* ptr, size_t size)
     return result;
 }
 
+int heap_report(void)
+{
+    char buffer[1024];
+    int len;
+
+    // White header.
+    write(1, "\033[1;37m", 7);
+    len = sprintf(buffer, "\n=====================================");
+    write(1, buffer, len);
+    len = sprintf(buffer, "\n     HeapHeaver Memory Report      ");
+    write(1, buffer, len);
+    len = sprintf(buffer, "\n=====================================");
+    write(1, buffer, len);
+
+    // Reset the colour.
+    write(1, "\033[0m", 4);
+
+    len = sprintf(buffer, "\nMemory Operation Counts:\n");
+    write(1, buffer, len);
+
+    len = sprintf(buffer, " Malloc: %d\n Calloc: %d\n Realloc: %d\n Free %d\n ", 
+                    malloc_count, calloc_count, realloc_count, free_count);
+    write(1, buffer, len);
+
+    len = sprintf(buffer, "\nMemory Allocation (bytes):\n");
+    write(1, buffer, len);
+
+    len = sprintf(buffer, " Malloc: %d\n Calloc: %d\n Realloc: %d\n Total: %d\n", 
+                    malloc_allocation, calloc_allocation, realloc_allocation, total_allocation);
+    write(1, buffer, len);
+
+    // Calculate remaning memory in heap aka if there are memory leaks
+    // Note the below is a place holder - realloc could act as free therefore not enough. 
+    int potential_leaks_counts = malloc_count + calloc_count + realloc_count - free_count;
+
+    int potential_leaks_bytes;
+
+    // Change output colour based on leak detection. 
+
+    if (potential_leaks_counts > 0){
+        // Red colour.
+        write(1, "\033[1;31m", 7);
+
+            len = sprintf(buffer, "\n=====================================");
+            write(1, buffer, len);
+            len = sprintf(buffer, "\n       Memory Leaks Detected", 
+                                    potential_leaks_counts > 0 ? potential_leaks_counts : 0);
+            write(1, buffer, len);
+            len = sprintf(buffer, "\n=====================================");
+            write(1, buffer, len);
+
+    }else{
+        // Green colour.
+        write(1, "\033[1;32m]", 7);
+        
+            len = sprintf(buffer, "\n=====================================");
+            write(1, buffer, len);
+            len = sprintf(buffer, "\n      No Memory Leaks", 
+                                    potential_leaks_counts > 0 ? potential_leaks_counts : 0);
+            write(1, buffer, len);
+            len = sprintf(buffer, "\n=====================================");
+            write(1, buffer, len);
+    }
+
+    // Remove colour.
+    write(1, "\033[0m]", 4);
+
+}
+
+// Destructor function is called when the shared library (.so) is unloaded.
+
+__attribute__((destructor))
+static void finalise_memory_hooks(void)
+{
+    DEBUG("\nHeapHeaver is finalising...");
+    heap_report();
+    // Print remaining nodes via print_nodes()
+}
+
