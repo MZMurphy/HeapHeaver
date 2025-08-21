@@ -34,13 +34,9 @@ int main(void)
     MemoryNode* found2 = search_nodes((void*)ptr2);
     void* notFound = search_nodes((void*)0x11111111);
 
-    if(found1 != NULL && found2 != NULL & notFound == NULL){
-        int addAndSearchTest = 0;
-        print_result("Add and search nodes", addAndSearchTest);
-    }else{
-        int addAndSearchTest = 1;
-        print_result("Add and search nodes", addAndSearchTest);
-    }
+    int addAndSearchTest = (found1 != NULL) && (found2 != NULL) && (notFound == NULL);
+    print_result("Add and search nodes", addAndSearchTest);
+
 
     printf("\nAfter adding nodes:\n");
     print_nodes();
