@@ -7,14 +7,27 @@ Something that has always mistified me is Valgrind's refusal to specify *which* 
 
 # How To Use
 
-1. Compile memory_hooks.c 
-`gcc -I./lib -c ./src/memory_hooks.c -o ./build/memory_hooks.out -fPIC -g -ggdb`
+# Build Instructions
 
-2. Compile heap_heaver
-`gcc -I./lib -c ./src/heap_heaver.c -o ./build/heap_heaver.out -fPIC -g -ggdb`
+## HeapHeaver
 
-3. Link both binaries / object files together into a shared library (.so) with dynamic loading
-`gcc -shared -o ./build/heap_heaver.so ./build/memory_hooks.out ./build/heap_heaver.out -ldl`
+```bash
+# 1. Compile memory_hooks.c
+gcc -I./lib -c ./src/memory_hooks.c -o ./build/memory_hooks.o -fPIC -g -ggdb
 
-4. Run your test binary with the shared library (.so) preloaded 
-` LD_PRELOAD=./build/heap_heaver.so ./tests/test.out `
+# 2. Compile heap_heaver.c
+gcc -I./lib -c ./src/heap_heaver.c -o ./build/heap_heaver.o -fPIC -g -ggdb
+
+# 3. Link into a shared library (.so)
+gcc -shared -o ./build/libheap_heaver.so ./build/memory_hooks.o ./build/heap_heaver.o -ldl
+
+# 4. Run target binary with heap_heaver.so (shared library) preloaded.
+ LD_PRELOAD=./build/heap_heaver.so ./tests/test.out
+```
+## Tests
+5. Compile memory_bookkeeping_test, which is isolated from the rest of HeapHeaver
+`gcc -I./lib -o ./tests/memory_bookkeping_test ./tests/memory_bookkeping_test.c ./src/memory_bookkeeping.c`
+
+6. Run bookkeeping test binary
+`./tests/memory_bookkeping_test`
+

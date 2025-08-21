@@ -147,7 +147,7 @@ int heap_report(void)
 
             len = sprintf(buffer, "\n=====================================");
             write(1, buffer, len);
-            len = sprintf(buffer, "\n     Memory Leaks Detected", 
+            len = sprintf(buffer, "\n       Memory Leaks Detected", 
                                     potential_leaks_counts > 0 ? potential_leaks_counts : 0);
             write(1, buffer, len);
             len = sprintf(buffer, "\n=====================================");
@@ -159,7 +159,7 @@ int heap_report(void)
         
             len = sprintf(buffer, "\n=====================================");
             write(1, buffer, len);
-            len = sprintf(buffer, "\n      No Memory Leaks", 
+            len = sprintf(buffer, "\n            No Memory Leaks", 
                                     potential_leaks_counts > 0 ? potential_leaks_counts : 0);
             write(1, buffer, len);
             len = sprintf(buffer, "\n=====================================");
@@ -178,6 +178,6 @@ static void finalise_memory_hooks(void)
 {
     DEBUG("\nHeapHeaver is finalising...");
     heap_report();
-    DEBUG("HeapHeaver finalised.");
+    // Print remaining nodes via print_nodes();
 }
 
